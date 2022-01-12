@@ -235,7 +235,7 @@ void dijkstra(int src, int dest){
         pop(head);
     }
     //free the memory left
-    free(priorityQN);
+    // free(priorityQN);
 }
 
 //a func that returns the shorthest path between two node represnets by two id's
