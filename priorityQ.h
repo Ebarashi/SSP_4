@@ -9,7 +9,6 @@ typedef struct PQNode {
     struct PQNode *next;
 } pqNode;
 
-
 pqNode* newNode(PNode d, int p);
 pqNode* peek(pqNode** head);
 void pop(pqNode** head);

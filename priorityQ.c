@@ -41,4 +41,4 @@ void push(pqNode** head, PNode d, int p){
 }
 
 //returns if the quqe is empty
-int isEmpty(pqNode** head){return (*head) == NULL;}
+int isEmpty(pqNode** head){if((*head) == NULL)return 1; else{return 0;}}

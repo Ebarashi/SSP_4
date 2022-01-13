@@ -42,30 +42,24 @@ PNode createNode(int id, PNode next, PEdge edges){
     return tempEdge;
 }
 
-//a funcation to free all the memory of the edges of a serten node 
-void freeEdgesOfNode(PNode N) {
+//a funcation to free all the memory of the edges that goes put of a serten node 
+void freeOutEdgesOfNode(PNode N) {
     PEdge edgesToDelete = N->edges;
-    //free only if there edges
-    if (edgesToDelete != NULL) {
-        PEdge tempEdge = edgesToDelete->next;
-        //if there only one edge free and return
-        if (tempEdge == NULL) {
-            free(edgesToDelete);
-        } 
-        else {
-            //else as long there is oanother edge move forward and delete the one we just passed
-            while (edgesToDelete->next != NULL) {
-                //remember the edge
-                PEdge PtempEdge = tempEdge;
-                //move forward
-                edgesToDelete->next = tempEdge->next;
-                //free the one we remmbered
-                free(PtempEdge);
-            }
-            //free the last edge
-            free(edgesToDelete);
+    while(edgesToDelete != NULL){
+        if(edgesToDelete->next !=NULL){
+            PEdge temp =edgesToDelete;
+            edgesToDelete =edgesToDelete->next;
+            free(temp);
         }
+        //else is the last edge free and we are done
+        else{
+            PEdge temp =edgesToDelete;
+            N->edges=NULL;
+            free(temp);
+            break;
+            }
     }
+    return;
 }
 //a func to add a node to the graph
 void addNode(){
@@ -79,7 +73,7 @@ void addNode(){
         tempNode = tempNode->next;
     }
     //if there is no node with the same id add the node
-    if (allreadyExists == 0) 
+    if (allreadyExists == 0)
     {
         //get the last node 
         PNode lastNode = GNodes;
@@ -94,7 +88,7 @@ void addNode(){
     else{
         PNode curr = GetNode(nodeId);
         //free all the edges of the node
-        freeEdgesOfNode(curr);
+        freeOutEdgesOfNode(curr);
         curr->edges = NULL;
         //add the new edges
         addEdges(curr);
@@ -109,34 +103,48 @@ PNode GetNode(int id){
     return head;
 }
 
-//a function to free all the memory related to a serten node
+//a function to free all the memory related to a serten nod
 void deleteNode(int id) {
+
     PNode NodeToDelete = GetNode(id);
     PNode head = GNodes;
     //goes troughe all the nodes and deletes the nodes that our node is the dest of their edge
-    while (head != NULL) {
-        PEdge edge = head->edges;
+    while ((head != NULL)&&(head->id!=id)) {
+        PEdge myedge = head->edges;
+        
+        //in case its the first edge
+        if((myedge!=NULL)&&(myedge->dest==NodeToDelete)){
+            head->edges=myedge->next;
+            free(myedge);
+            head=head->next;
+            continue;
+        }
+        //otherwise go over the rest of edges
         //run on all the edges and search for an edge that conatin our node
-        while (edge != NULL) {
-            //if we found en edge, go forward and free the edge
-            if (edge->dest == NodeToDelete) {
-                head->edges = edge->next;
-                PEdge pe = edge;
-                free(pe);
-                edge = NULL;
-            } 
-            else {
-                //else check if the edge.next is a edge that contains our edge
-                //if it does connect next to the next next anf free the edge
-                PEdge tempEdge = edge->next;
-                if (tempEdge != NULL && tempEdge->dest == NodeToDelete) {
-                    edge->next = tempEdge->next;
-                    free(tempEdge);
-                }
-                //else move to the next edge
-                else {edge = tempEdge;}
+        while (myedge != NULL) {
+            if ((myedge->next!=NULL)&&(myedge->next->dest == NodeToDelete)) {
+                PEdge temp = myedge;
+                PEdge tofree = myedge->next;
+                myedge = myedge->next->next;
+                temp->next=myedge;
+                free(tofree);
+            }
+            else{
+                myedge=myedge->next;
             }
         }
+        // //in case the edge is the last edge
+        // PEdge temp =head->edges;
+        // PEdge prev =NULL;
+        // while((temp !=NULL) &&(temp->next!=NULL)){
+        //     prev=temp;
+        //     temp=temp->next;
+        // }
+        // if((temp !=NULL) && (temp->dest==NodeToDelete)){
+        //     prev->next=NULL;
+        //     free(temp);
+        // }
+        
         //go to the next node
         head = head->next;
     }
@@ -148,11 +156,13 @@ void deleteNode(int id) {
         }
         head2->next = NodeToDelete->next;
     }
+    else{GNodes = NodeToDelete->next;}
     //free all the edges of the node
-    freeEdgesOfNode(NodeToDelete);
+    freeOutEdgesOfNode(NodeToDelete);
     //free the node itself
     free(NodeToDelete);
 }
+
 //a funaction to delete our intire graph
 void deleteGraph(){
     PNode head = GNodes;
@@ -164,8 +174,6 @@ void deleteGraph(){
         head = head->next;
         deleteNode(nodeId);
     }
-    //free the head of our graph
-    free(head);
     GNodes = NULL;
 }
 // a function we saw on the other courses(oop,algorthims)
@@ -208,8 +216,7 @@ void dijkstra(int src, int dest){
                 while (isEmpty(head) == 0){
                     pop(head);
                 }
-                //free the memory we dont need it any more
-                free(priorityQN);
+//                free(priorityQN);
                 return;
             }
             currentN->data->visited = 1;
@@ -234,8 +241,13 @@ void dijkstra(int src, int dest){
         }
         pop(head);
     }
-    //free the memory left
-    // free(priorityQN);
+    // pqNode * temp = priorityQN;
+    // while(temp != NULL){
+    //     pqNode* curr = temp;
+    //     temp = temp->next;
+    //     free(curr); 
+    // }
+    free(priorityQN);
 }
 
 //a func that returns the shorthest path between two node represnets by two id's
@@ -349,17 +361,18 @@ void addEdges(PNode node){
     //invalid input stop func
     if(input == '\n'){return;}
     //while input is coarrect continue to connect edges
-    while ((scanf("%d", &dest) == 1)&&(scanf("%d", &weight) == 1)){
-        PEdge tempEdge = (PEdge)malloc(sizeof(edge));
-        tempEdge->next = NULL;
-        Edge->next = tempEdge;
-        tempEdge->weight = weight;
-        tempEdge->dest = GetNode(dest);
-        Edge = tempEdge;
+    while (scanf("%d", &dest) == 1){
+        if(scanf("%d", &weight) == 1){
+            PEdge tempEdge = (PEdge)malloc(sizeof(edge));
+            tempEdge->next = NULL;
+            Edge->next = tempEdge;
+            tempEdge->weight = weight;
+            tempEdge->dest = GetNode(dest);
+            Edge = tempEdge;
+        }
     
         scanf("%c", &input);
         //invalid input stop func
         if(input == '\n'){return;}
     }
-    return;
 }

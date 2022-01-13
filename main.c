@@ -1,3 +1,6 @@
+
+
+
 #include <stdio.h>
 #include "algo.h"
 
@@ -15,32 +18,31 @@ int main()
             scanf("%d", &src);
             createNodes(src);
         }
-        if(ch == 'n') {
+        else if(ch == 'n') {
             createGraph();
         }
-        if(ch == 'B') {
+        else if(ch == 'B') {
             addNode();
         }
-        if(ch == 'D') {
+        else if(ch == 'D') {
             scanf("%d", &src);
             deleteNode(src);
         }
-        if(ch == 'S') {
+        else if(ch == 'S') {
             scanf("%d", &src);
             scanf("%d", &dest);
             ans = shortestPath(src, dest);
             printf("Dijsktra shortest path: %d \n", ans);
         }
-        if(ch == 'T') {
+        else if(ch == 'T') {
             scanf("%d", &src);
             TSP(src);
         }
-        if(ch == '\n') {
+        else if(ch == '\n') {
             deleteGraph();
             break;
         }
 
     }
-
     return 0;
 }
