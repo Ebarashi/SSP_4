@@ -9,7 +9,6 @@ int main()
     char ch;
     int src;
     int dest;
-    int ans = 0;
 
     while (1)
     {
@@ -31,8 +30,7 @@ int main()
         else if(ch == 'S') {
             scanf("%d", &src);
             scanf("%d", &dest);
-            ans = shortestPath(src, dest);
-            printf("Dijsktra shortest path: %d \n", ans);
+            shortestPath(src, dest);
         }
         else if(ch == 'T') {
             scanf("%d", &src);
