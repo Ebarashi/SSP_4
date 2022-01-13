@@ -110,27 +110,27 @@ void deleteNode(int id) {
     PNode head = GNodes;
     //goes troughe all the nodes and deletes the nodes that our node is the dest of their edge
     while ((head != NULL)&&(head->id!=id)) {
-        PEdge myedge = head->edges;
+        PEdge myCurrEdge = head->edges;
         
         //in case its the first edge
-        if((myedge!=NULL)&&(myedge->dest==NodeToDelete)){
-            head->edges=myedge->next;
-            free(myedge);
+        if((myCurrEdge!=NULL)&&(myCurrEdge->dest==NodeToDelete)){
+            head->edges=myCurrEdge->next;
+            free(myCurrEdge);
             head=head->next;
             continue;
         }
         //otherwise go over the rest of edges
         //run on all the edges and search for an edge that conatin our node
-        while (myedge != NULL) {
-            if ((myedge->next!=NULL)&&(myedge->next->dest == NodeToDelete)) {
-                PEdge temp = myedge;
-                PEdge tofree = myedge->next;
-                myedge = myedge->next->next;
-                temp->next=myedge;
+        while (myCurrEdge != NULL) {
+            if ((myCurrEdge->next!=NULL)&&(myCurrEdge->next->dest == NodeToDelete)) {
+                PEdge temp = myCurrEdge;
+                PEdge tofree = myCurrEdge->next;
+                myCurrEdge = myCurrEdge->next->next;
+                temp->next=myCurrEdge;
                 free(tofree);
             }
             else{
-                myedge=myedge->next;
+                myCurrEdge=myCurrEdge->next;
             }
         }
         // //in case the edge is the last edge
